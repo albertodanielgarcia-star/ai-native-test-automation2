@@ -96,3 +96,58 @@ dependencies. It has **no** Page Objects, fixtures, API clients,
 test-data layers, custom reporters, or environment configuration on
 purpose — those are course topics you will build properly later. Treat
 it as a spare tire, not the car.
+
+## API Interception & Mocking
+
+This project includes examples of browser network interception and API response mocking using Playwright's native capabilities.
+
+See [docs/api-interception-mocking.md](docs/api-interception-mocking.md) for:
+- What it is and what problem it solves
+- Difference between real API tests and browser mocking
+- When to use it and when to avoid it
+- How it works with commented examples
+- How to run it and debug it
+- How to add new mocks
+- Maintenance and limits
+
+## CI/CD & Quality Gates
+
+This project includes a GitHub Actions workflow that runs automated checks on every push and pull request.
+
+### Workflow Checks
+
+The `.github/workflows/playwright.yml` workflow executes:
+1. **TypeScript Validation**: `npx -p typescript tsc --noEmit` - validates type safety
+2. **Playwright Tests**: `npx playwright test` - runs all UI, API, and mocking tests
+3. **Report Artifacts**: HTML report uploaded on every run (retention: 30 days)
+4. **Trace Artifacts**: Trace files uploaded on failure (retention: 30 days)
+
+### Quality Gates (Manual Configuration)
+
+To enforce quality standards, the following checks can be configured as required in GitHub branch protection rules:
+
+| Check | Command | Purpose |
+|-------|---------|---------|
+| TypeScript Validation | `npx -p typescript tsc --noEmit` | Ensures type safety before merge |
+| Playwright Tests | `npx playwright test` | Ensures all tests pass before merge |
+| SauceDemo UI Tests | `npx playwright test tests/saucemo.spec.ts` | Ensures UI automation passes |
+| DummyJSON API Tests | `npx playwright test tests/api/products.spec.ts` | Ensures API tests pass |
+
+**Note**: These checks are documented here for reference but are NOT automatically enabled. To enable them as required checks, configure branch protection rules in your GitHub repository settings.
+
+### Local Validation
+
+Before pushing, validate locally:
+```bash
+cd starter
+npm ci
+npx -p typescript tsc --noEmit
+npx playwright test
+```
+
+### Viewing CI Results
+
+After pushing or opening a PR:
+1. Go to the **Actions** tab in your GitHub repository
+2. Click on the latest **Playwright Tests** workflow run
+3. Download artifacts (`playwright-report` for HTML report, `playwright-trace` for failure traces)
